@@ -22,12 +22,25 @@ Class icsParser {
    var $icsArray        = array();
    var $icsDetails      = array();
    var $brk             = 'END:VTIMEZONE';
+   var $startDateFormat = 'Y-m-d g:i A';
+   var $endDateFormat   = 'Y-m-d g:i A';
    
    public function __construct($file){
       $this->icsFile = file_get_contents($file);
       $this->stripHeader();
       $this->createArray();
       $this->parseArrayItems();
+   }
+   
+   public function setDateFormat($type, $format){
+      if(strtolower($type) === 'start'){
+         $this->startDateFormat = $format;
+      } else if(strtolower($type) === 'end'){
+         $this->endDateFormat = $format;
+      }
+      
+      $this->icsDetails = array();
+      $this->parseArrayItems();  
    }
    
    
@@ -107,8 +120,8 @@ Class icsParser {
          $parsedItem['start']       = $this->parseItemString($item, 'dtstart', 'dtend');
          $parsedItem['end']         = $this->parseItemString($item, 'dtend', 'uid');
          
-         $parsedItem['start']       = $this->parseDateString($parsedItem['start']);
-         $parsedItem['end']         = $this->parseDateString($parsedItem['end']);
+         $parsedItem['start']       = $this->parseDateString($parsedItem['start'], 'start');
+         $parsedItem['end']         = $this->parseDateString($parsedItem['end'], 'end');
          
          array_push($this->icsDetails, $parsedItem);
       }
@@ -144,16 +157,25 @@ Class icsParser {
       }
    }
    
-   private function parseDateString($dateString){
+   private function parseDateString($dateString, $type){
+      if($type === 'start'){
+         $dateFormat = $this->startDateFormat;
+      } else if($type === 'end'){
+         $dateFormat = $this->endDateFormat;
+      } else {
+         $dateFormat = 'Y-m-d g:i A';
+      }
+      
       $startPos   = strpos($dateString, ':');
       $timeString = substr($dateString, ($startPos + 1));
       
-      return date('Y-m-d g:i A', strtotime($timeString)); 
+      return date($dateFormat, strtotime($timeString)); 
    }
    
    private function getItemString($item, $startPos, $endPos){
       return substr($item, $startPos, ($endPos - $startPos));
    }
+   
    
    private function cleanUpString($str){
       $str = str_replace(array("\r\n ", "\n ", "\r "), '', $str);

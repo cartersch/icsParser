@@ -14,7 +14,11 @@ To instantiate the class you can do the following:
     $icsData  = new icsParser($icalFile);
 
 ***Public Methods***
-There are three public methods:
+There are four public methods:
+
+- setDateFormat: allows you to set how you want the start/end date to be formatted using php date formats
+    
+    $icsData->setDateFormat('start', 'Y-m-d');
 
 - getAllEvents: Returns all entries in the ical file.
     
