@@ -163,7 +163,8 @@ Class icsParser {
       } else if($type === 'end'){
          $dateFormat = $this->endDateFormat;
       } else {
-         $dateFormat = 'Y-m-d g:i A';
+         $dateFormat = 'Y-m-d g:i A';include 'icsParser.php';
+         
       }
       
       $startPos   = strpos($dateString, ':');
@@ -181,8 +182,9 @@ Class icsParser {
       $str = str_replace(array("\r\n ", "\n ", "\r "), '', $str);
       $str = str_replace(array("\\n", "\\N"), "\n", $str);
       $str = stripslashes($str);
+      $str = htmlentities($str, ENT_QUOTES);
       
-      return nl2br($str);
+      return $str;
    }
 }
 
